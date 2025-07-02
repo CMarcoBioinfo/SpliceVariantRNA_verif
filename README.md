@@ -4,6 +4,7 @@
 **SpliceVariantRNA** is a Snakemake pipeline designed to study alternative splicing in RNA sequencing data.
 It automates and enhances the SpliceLauncher tool by applying additional filtering steps.
 For each detected and sorted splicing event, a Sashimi plot is generated to facilitate interpretation.
+A proposed HGVS-compliant variant annotation is also provided to facilitate interpretation.
 
 ## Table of Contents
 

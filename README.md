@@ -112,6 +112,7 @@ However, compatibility is **not guaranteed** for versions significantly differen
 
 Before you start, make sure you have installed:
 - **Python 3.12**
+- **java (17.0.12)**
 - **R (4.1.2)**
 - **Perl (v. 5.34.0)**
 - **awk (mawk 1.3.4)**
@@ -120,7 +121,9 @@ Before you start, make sure you have installed:
 - **fastp (0.20.1)**
 - **FastQC (v. 0.11.9)**
 - **MultiQC (v. 1.24.1)**
+- **RSeQC (5.0.4)**
 - **STAR (2.7.11b)**
+- **Picard (3.4.0)**
 - **samtools (1.13)**
 - **bedtools (v2.30.0)**
 - **ggsashimi (v1.1.5)**
@@ -129,15 +132,18 @@ Before you start, make sure you have installed:
 Run the following commands to check if everything is installed correctly:
 ```bash
 python --version
+java --version
 R --version
-snakemake --version
 perl -v
 awk -W version
+snakemake --version
 pigz -V
 fastp --version
 fastqc --version
 multiqc --version
+read_duplication --version #RSeQC
 STAR --version
+picard MarkDuplicates --version
 samtools --version
 bedtools --version
 ggsashimi --version
@@ -172,12 +178,14 @@ data/
     │   ├── {your_annotation}.gff3
     │   ├── ({your_annotation}.gtf)
     ├── fastq/
-    │   ├── sample_001_R1.fastq.gz
-    │   ├── sample_001_R2.fastq.gz
-    │   ├── sample_002_R1.fastq.gz
-    │   ├── sample_002_R2.fastq.gz
-    │   ├── sample_003_R1.fastq.gz
-    │   ├── sample_003_R2.fastq.gz
+    |   ├── {group}
+    │   │    ├── sample_001_R1.fastq.gz
+    │   │    ├── sample_001_R2.fastq.gz
+    │   │    ├── sample_002_R1.fastq.gz
+    │   │    ├── sample_002_R2.fastq.gz
+    │   │    ├── sample_003_R1.fastq.gz
+    │   │    └── sample_003_R2.fastq.gz
+    │   └── {other group}
     ├── metadata/
     │   ├── genes_of_interest/
     │   │   └── (genes_of_interest_example.txt)
@@ -201,14 +209,14 @@ The file follows a **tab-separated format (`.tsv`)**, with the following **colum
 | `id`            | **Sample identifier** (unique name for each sample) |
 | `path_read1`    | **Path to the forward (R1) read file** |
 | `path_read2`    | **Path to the reverse (R2) read file** |
-| `sequencing_date` | **Date of sequencing** in YYYYMMDD format or others |
+| `group(sequencing_date)` | **Date of sequencing** in YYYYMMDD format or others |
 | `technology`   | **Sequencing technology** (e.g., Illumina, Nanopore) |
 
 #### Example
 Here is an example of a correctly formatted file:
 
 ```plaintext
-id  path_read1  path_read2  sequencing_date technology
+id  path_read1  path_read2  group(sequencing_date) technology
 SAMPLE_001  /data/fastq/sample_001_R1.fastq.gz  /data/fastq/sample_001_R2.fastq.gz  20240510    Illumina
 SAMPLE_002  /data/fastq/sample_002_R1.fastq.gz  /data/fastq/sample_002_R2.fastq.gz  20240510    Nanopore
 SAMPLE_003  /data/fastq/sample_003_R1.fastq.gz  /data/fastq/sample_003_R2.fastq.gz  20240510    Illumina
@@ -303,13 +311,15 @@ This directory contains **trimmed FASTQ files**.
 data/
 └── 2-processed_data/
     └── fastq_trimmed/
-        ├── sample_001.{N}bp.1.fastq.gz  # Reads after filtering
-        ├── sample_001.{N}bp.2.fastq.gz
-        ├── sample_002.{N}bp.1.fastq.gz
-        ├── sample_002.{N}bp.2.fastq.gz
-        ├── sample_003.{N}bp.1.fastq.gz
-        ├── sample_003.{N}bp.2.fastq.gz
-        └── other filtered FASTQ files...
+        ├── {group}
+        │   ├── sample_001.{N}bp.1.fastq.gz  # Reads after filtering
+        │   ├── sample_001.{N}bp.2.fastq.gz
+        │   ├── sample_002.{N}bp.1.fastq.gz
+        │   ├── sample_002.{N}bp.2.fastq.gz
+        │   ├── sample_003.{N}bp.1.fastq.gz
+        │   ├── sample_003.{N}bp.2.fastq.gz
+        │   └── other filtered FASTQ files...
+        └── {other group}    
 ```
 > ⚠ **If trimming is disabled (`TRIMMING: 0`), this directory is not created**, and files remain in `1-raw_data/`.
 
@@ -328,21 +338,32 @@ data/
     └── BAM/
         └── {your_reference}/
             ├── mapping/
-            │   ├── sample_001[.{N}bp].sorted.bam  # STAR-aligned reads
-            │   ├── sample_001[.{N}bp].sorted.bam.bai  # BAM index file
-            │   ├── sample_002[.{N}bp].sorted.bam 
-            │   ├── sample_002[.{N}bp].sorted.bam.bai  
-            │   ├── sample_003[.{N}bp].sorted.bam
-            │   ├── sample_003[.{N}bp].sorted.bam.bai
-            │   └── log_star/  # STAR log files
+            │   ├── {group}
+            │   │   ├── sample_001[.{N}bp].sorted.bam  # STAR-aligned reads
+            │   │   ├── sample_001[.{N}bp].sorted.bam.bai  # BAM index file
+            │   │   ├── sample_002[.{N}bp].sorted.bam 
+            │   │   ├── sample_002[.{N}bp].sorted.bam.bai  
+            │   │   ├── sample_003[.{N}bp].sorted.bam
+            │   │   └── sample_003[.{N}bp].sorted.bam.bai
+            │   ├── {other group}
+            │   ├── log_star/  # STAR log files
+            │   │   ├── {group}
+            │   │   └── {other group}
+            │   └── log_MarkDuplicates/  # STAR log files
+            │       ├── {group}
+            │       └── {other group}
             └── SpliceLauncher/
-                ├── sample_001[.{N}bp]_juncs.bed  # Detected splice junctions
-                ├── sample_002[.{N}bp]_juncs.bed
-                ├── sample_003[.{N}bp]_juncs.bed
+                ├── {group}
+                │   ├── sample_001[.{N}bp]_juncs.bed  # Detected splice junctions
+                │   ├── sample_002[.{N}bp]_juncs.bed
+                │   └── sample_003[.{N}bp]_juncs.bed
+                ├── {other group}
                 └── getClosestExons/  # Closest exon information
-                        ├── sample_001[.{N}bp].count
-                        ├── sample_002[.{N}bp].count
-                        └── sample_003[.{N}bp].count
+                    ├── {group}
+                    │   ├── sample_001[.{N}bp].count
+                    │   ├── sample_002[.{N}bp].count
+                    │   └── sample_003[.{N}bp].count
+                    └── {other group}
 ```
 
 > **Note**: In all filenames, parts enclosed in brackets (e.g., `[.{N}bp]`) indicate optional suffixes that appear only when trimming is enabled.

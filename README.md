@@ -317,7 +317,7 @@ This directory contains **trimmed FASTQ files**.
 data/
 └── 2-processed_data/
     └── fastq_trimmed/
-        ├── {group}
+        ├── {group}/
         │   ├── sample_001.{N}bp.1.fastq.gz  # Reads after filtering
         │   ├── sample_001.{N}bp.2.fastq.gz
         │   ├── sample_002.{N}bp.1.fastq.gz
@@ -325,7 +325,7 @@ data/
         │   ├── sample_003.{N}bp.1.fastq.gz
         │   ├── sample_003.{N}bp.2.fastq.gz
         │   └── other filtered FASTQ files...
-        └── {other group}    
+        └── {other group}/    
 ```
 > ⚠ **If trimming is disabled (`TRIMMING: 0`), this directory is not created**, and files remain in `1-raw_data/`.
 
@@ -345,7 +345,7 @@ data/
     └── BAM/
         └── {your_reference}/
             ├── mapping/
-            │   ├── {group}
+            │   ├── {group}/
             │   │   ├── sample_001[.{N}bp].sorted.bam  # STAR-aligned reads
             │   │   ├── sample_001[.{N}bp].sorted.bam.bai  # BAM index file
             │   │   ├── sample_001[.{N}bp].sorted.bam.csi
@@ -364,25 +364,25 @@ data/
             │   │   ├── sample_003[.{N}bp].markdup.bam
             │   │   ├── sample_003[.{N}bp].markdup.bam.bai
             │   │   └── sample_003[.{N}bp].markdup.bam.csi
-            │   ├── {other group}
+            │   ├── {other group}/
             │   ├── log_star/  # STAR log files
-            │   │   ├── {group}
-            │   │   └── {other group}
+            │   │   ├── {group}/
+            │   │   └── {other group}/
             │   └── log_MarkDuplicates/  # Picard MarkDuplicates log files
-            │       ├── {group}
-            │       └── {other group}
+            │       ├── {group}/
+            │       └── {other group}/
             └── SpliceLauncher/
-                ├── {group}
+                ├── {group}/
                 │   ├── sample_001[.{N}bp]_juncs.bed  # Detected splice junctions
                 │   ├── sample_002[.{N}bp]_juncs.bed
                 │   └── sample_003[.{N}bp]_juncs.bed
-                ├── {other group}
+                ├── {other group}/
                 └── getClosestExons/  # Closest exon information
-                    ├── {group}
+                    ├── {group}/
                     │   ├── sample_001[.{N}bp].count
                     │   ├── sample_002[.{N}bp].count
                     │   └── sample_003[.{N}bp].count
-                    └── {other group}
+                    └── {other group}/
 ```
 
 > **Note**: In all filenames, parts enclosed in brackets (e.g., `[.{N}bp]`) indicate optional suffixes that appear only when trimming is enabled.
@@ -441,7 +441,7 @@ data/
                 ├── {your_prefix}_{unique_id}.non_statistical_junctions.[xlsx,txt]
                 ├── report_{your_prefix}_{unique_id}.html
                 └── samples_results/
-                    ├── {group}
+                    ├── {group}/
                     │   ├── sample_001[.{N}bp]/
                     │   │   ├── sample_001[.{N}bp].pdf
                     │   │   ├── sample_001[.{N}bp]_genes.pdf
@@ -472,7 +472,7 @@ data/
                     │   │   └── .....
                     │   └── sample_003[.{N}bp]/
                     │        └── .....
-                    └── {other group}
+                    └── {other group}/
 ```
 
 ---
@@ -660,6 +660,23 @@ A synthetic HGVS string is then generated:
 - For other complex or ambiguous events: "Complex annotation"
 
 > ⚠ This field is automatically generated to support downstream interpretation, but it is provided as a preliminary suggestion only and may require manual curation in clinical contexts.
+
+## Dashboards (`5-Dashboards/`)
+
+The **Dashboards** directory provides interactive HTML reports that serve as the **entry point for biologists**.  
+Instead of browsing through multiple folders and files, biologists can directly open these dashboards in a web browser to access QC metrics and results.
+
+### Directory Structure
+
+```bash
+data/
+└── 5-Dashboards/
+    ├── {group}/
+    │   ├── dashboard_{prefix}_{unique_id}.html
+    │   └── ...
+    └── {other_group}/
+        └── dashboard_{prefix}_{unique_id}.html
+```
 
 ## Authors
 
